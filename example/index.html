@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<style type="text/css">
+		table {
+			width: 100%;
+			table-layout: fixed;
+		}
+		#editorBody {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+		.ace_editor {
+			position: absolute;
+			width: 100%;
+			height: 90vh;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="editorBody">
+	<div>For an example, try converting YAML from the <a href="javascript:" id="sample">sample.yml</a></div>
+	<table>
+		<tbody>
+			<tr>
+				<th style="width: 45%;">YAML</th>
+				<th style="width: 10%; font-size: 22px;">→</th>
+				<th style="width: 45%;">Go</th>
+			</tr>
+		</tbody>
+	</table>
+	<table>
+		<tbody>
+			<tr>
+				<td>
+					<div id="inputEditor" class="ace_editor"></div>
+				</td>
+				<td>
+					<div id="outputEditor" class="ace_editor"></div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+
+	<script type="text/javascript" src="lib/ace/ace.js"></script>
+	<script type="text/javascript" src="lib/ace/mode-golang.js"></script>
+	<script type="text/javascript" src="lib/ace/mode-yaml.js"></script>
+	<script type="text/javascript" src="lib/ace/theme-monokai.js"></script>
+	<script type="text/javascript" src="lib/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/yaml.min.js"></script>
+	<script type="text/javascript" src="../yaml-to-go.js"></script>
+	<script>
+		var sampleYam = "input_index: 0\ncandidate_index: 0\ndelivery_line_1: 1 N Rosedale St\nlast_line: Baltimore MD 21229-3737\ndelivery_point_barcode: '212293737013'\ncomponents:\n  primary_number: '1'\n  street_predirection: N\n  street_name: Rosedale\n  street_suffix: St\n  city_name: Baltimore\n  state_abbreviation: MD\n  zipcode: '21229'\n  plus4_code: '3737'\n  delivery_point: '01'\n  delivery_point_check_digit: '3'\nmetadata:\n  record_type: S\n  zip_type: Standard\n  county_fips: '24510'\n  county_name: Baltimore City\n  carrier_route: C047\n  congressional_district: '07'\n  rdi: Residential\n  elot_sequence: 0059\n  elot_sort: A\n  latitude: 39.28602\n  longitude: -76.6689\n  precision: Zip9\n  time_zone: Eastern\n  utc_offset: -5\n  dst: true\nanalysis:\n  dpv_match_code: Y\n  dpv_footnotes: AABB\n  dpv_cmra: N\n  dpv_vacant: N\n  active: Y\ninput_index: 0\ncandidate_index: 1\ndelivery_line_1: 1 S Rosedale St\nlast_line: Baltimore MD 21229-3739\ndelivery_point_barcode: '212293739011'\ncomponents:\n  primary_number: '1'\n  street_predirection: S\n  street_name: Rosedale\n  street_suffix: St\n  city_name: Baltimore\n  state_abbreviation: MD\n  zipcode: '21229'\n  plus4_code: '3739'\n  delivery_point: '01'\n  delivery_point_check_digit: '1'\nmetadata:\n  record_type: S\n  zip_type: Standard\n  county_fips: '24510'\n  county_name: Baltimore City\n  carrier_route: C047\n  congressional_district: '07'\n  rdi: Residential\n  elot_sequence: '0064'\n  elot_sort: A\n  latitude: 39.2858\n  longitude: -76.66889\n  precision: Zip9\n  time_zone: Eastern\n  utc_offset: -5\n  dst: true\nanalysis:\n  dpv_match_code: Y\n  dpv_footnotes: AABB\n  dpv_cmra: N\n  dpv_vacant: N\n  active: Y\n";
+		var defaultInput = "Paste YAML here";
+		var defaultOutput = "Go will appear here";
+		var iEditor = ace.edit("inputEditor");
+		var oEditor = ace.edit("outputEditor");
+
+		iEditor.$blockScrolling = Infinity
+		iEditor.setTheme("ace/theme/monokai");
+		iEditor.getSession().setMode("ace/mode/yaml");
+		iEditor.setValue(defaultInput);
+		iEditor.getSession().setTabSize(4);
+		
+		oEditor.$blockScrolling = Infinity
+		oEditor.setTheme("ace/theme/monokai");
+		oEditor.getSession().setMode("ace/mode/golang");
+		oEditor.setValue(defaultOutput);
+		oEditor.getSession().setTabSize(4);
+		oEditor.setReadOnly(true);
+		
+		iEditor.on('focus', function(e) {
+			var input = iEditor.getValue();
+			if (!input) {
+				iEditor.setValue(defaultInput);
+				iEditor.gotoLine(0);
+				oEditor.setValue(defaultOutput);
+				oEditor.gotoLine(0);
+			} else if (input === defaultInput) {
+				iEditor.setValue("");
+			}
+		});
+		iEditor.on('blur', function(e) {
+			var input = iEditor.getValue();
+			if (!input) {
+				iEditor.setValue(defaultInput);
+				iEditor.gotoLine(0);
+				oEditor.setValue(defaultOutput);
+				oEditor.gotoLine(0);
+			}
+		});
+		iEditor.on('change', function(e) {
+			var input = iEditor.getValue();
+			if (!input) {
+				oEditor.setValue(defaultOutput);
+				oEditor.gotoLine(0);
+				return;
+			}
+			var output = yamlToGo(iEditor.getValue());
+			if (output.error)
+				oEditor.setValue(output.error);
+			else {
+				oEditor.setValue(output.go);
+			}
+			oEditor.gotoLine(0);
+		});
+		// Fill in sample YAML if the user wants to see an example
+		$('#sample').click(function() {
+			iEditor.setValue(sampleYam);
+			iEditor.gotoLine(0);
+		});
+	</script>
+</body>
+
+</html>
