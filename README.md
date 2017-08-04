@@ -2,7 +2,7 @@
 
 Parse `yaml string to js object`(used [jeremyfa/yaml.js](https://github.com/jeremyfa/yaml.js)) and `convert to Go struct`(reference by [json-to-go](https://github.com/mholt/json-to-go)).
 
-[Check example in jsfiddle](https://jsfiddle.net/6zopgcvc/show/)
+[Check example in jsfiddle](https://jsfiddle.net/s2zcm0jb/show/)
 
 ___
 
@@ -35,6 +35,7 @@ ___
 
 * [mholt/json-to-go](https://github.com/mholt/json-to-go)
 * [jeremyfa/yaml.js](https://github.com/jeremyfa/yaml.js)
+* [go-yaml/yaml](https://github.com/go-yaml/yaml)
 
 ___
 
